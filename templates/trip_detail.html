@@ -1,0 +1,132 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h2>{{ trip.title }}
+            <span class="badge bg-{{ 'success' if trip.status == 'itinerary_generated' else 'warning' }} ms-2">{{ trip.status.replace('_', ' ').title() }}</span>
+        </h2>
+        <p class="lead">
+            <i class="fas fa-map-marker-alt me-2"></i>{{ trip.destination }} | 
+            <i class="fas fa-calendar me-2"></i>{{ trip.start_date.strftime('%B %d, %Y') }} - {{ trip.end_date.strftime('%B %d, %Y') }} | 
+            <i class="fas fa-dollar-sign me-2"></i>${{ "%.0f"|format(trip.budget) }}
+        </p>
+    </div>
+    <div class="col-auto">
+        {% if trip.status != 'itinerary_generated' %}
+        <a href="{{ url_for('generate_itinerary', trip_id=trip.id) }}" class="btn btn-success btn-lg">
+            <i class="fas fa-magic me-2"></i>Generate AI Itinerary
+        </a>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Participants Section -->
+<div class="row mb-5">
+    <div class="col-12">
+        <h4><i class="fas fa-users me-2"></i>Participants ({{ participants|length }})</h4>
+        <div class="row">
+            {% for p in participants %}
+            <div class="col-md-4 mb-3">
+                <div class="card h-100">
+                    <div class="card-body text-center">
+                        <h6>{{ p.name }}</h6>
+                        <small class="text-muted">{{ p.phone }}</small>
+                    </div>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        <button class="btn btn-outline-primary" onclick="showAddParticipant()">
+            <i class="fas fa-plus me-2"></i>Add Participant
+        </button>
+    </div>
+</div>
+
+<!-- Add Participant Modal -->
+<div class="modal fade" id="participantModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add Participant</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="participantForm">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Phone</label>
+                        <input type="tel" class="form-control" name="phone" required>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">Add Friend</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Itinerary Section -->
+{% if itinerary %}
+<div class="row">
+    <div class="col-12">
+        <h4><i class="fas fa-map me-2"></i>AI Generated Itinerary</h4>
+        {% for item in itinerary %}
+        <div class="itinerary-item">
+            <div class="row align-items-center">
+                <div class="col-md-2 text-center">
+                    <div class="badge bg-primary fs-6 px-3 py-2">{{ item.day }}</div>
+                    <div class="mt-2 fw-bold">{{ item.time }}</div>
+                </div>
+                <div class="col-md-3">
+                    <img src="{{ item.image_url }}" alt="{{ item.place_name }}" class="place-image">
+                </div>
+                <div class="col-md-5">
+                    <h5>{{ item.place_name }}</h5>
+                    <p class="text-muted">{{ item.description }}</p>
+                    <small>
+                        <i class="fas fa-clock me-1"></i>{{ item.duration }} | 
+                        <i class="fas fa-dollar-sign me-1"></i>${{ item.cost_estimate }} 
+                    </small>
+                </div>
+                <div class="col-md-2 text-end">
+                    <div class="btn-group-vertical w-100">
+                        <button class="btn btn-outline-primary btn-sm">Navigate</button>
+                        <button class="btn btn-outline-success btn-sm">Share</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+</div>
+{% endif %}
+
+<script>
+function showAddParticipant() {
+    new bootstrap.Modal(document.getElementById('participantModal')).show();
+}
+
+document.getElementById('participantForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const formData = new FormData(this);
+    formData.append('trip_id', {{ trip.id }});
+    
+    fetch('/trip/{{ trip.id }}/add-participant', {
+        method: 'POST',
+        body: new URLSearchParams(formData)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            location.reload();
+        } else {
+            alert('Error: ' + (data.error || 'Unknown error'));
+        }
+    });
+});
+</script>
+{% endblock %}

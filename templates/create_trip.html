@@ -1,0 +1,44 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-8 col-lg-6">
+        <div class="card">
+            <div class="card-body p-5">
+                <h2 class="text-center mb-4">
+                    <i class="fas fa-plane me-2"></i>New Trip
+                </h2>
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.title.label }}</label>
+                            {{ form.title(class="form-control form-control-lg", placeholder="Summer Vacation 2024") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.destination.label }}</label>
+                            {{ form.destination(class="form-control form-control-lg", placeholder="Goa, Paris, Bali...") }}
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.budget.label }}</label>
+                            {{ form.budget(class="form-control form-control-lg", placeholder="5000") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.start_date.label }}</label>
+                            {{ form.start_date(class="form-control form-control-lg") }}
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label class="form-label">{{ form.end_date.label }}</label>
+                            {{ form.end_date(class="form-control form-control-lg") }}
+                        </div>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-lg w-100">
+                        <i class="fas fa-magic me-2"></i>Create Trip & Plan with AI
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,47 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="row mb-4">
+    <div class="col">
+        <h1 class="display-4 text-white mb-4">
+            <i class="fas fa-globe-americas me-3"></i>Welcome{{ ' ' + user.username if user.is_authenticated else '' }}!
+        </h1>
+        {% if user.is_authenticated %}
+            <a href="{{ url_for('create_trip') }}" class="btn btn-primary btn-lg">
+                <i class="fas fa-plus me-2"></i>Create New Trip
+            </a>
+        {% endif %}
+    </div>
+</div>
+
+{% if user.is_authenticated and trips %}
+<div class="row">
+    {% for trip in trips %}
+    <div class="col-md-6 col-lg-4 mb-4">
+        <div class="card trip-card h-100">
+            <div class="card-body">
+                <h5 class="card-title">{{ trip.title }}</h5>
+                <p class="card-text">
+                    <i class="fas fa-map-marker-alt me-1"></i>{{ trip.destination }}<br>
+                    <i class="fas fa-calendar me-1"></i>{{ trip.start_date.strftime('%b %d') }} - {{ trip.end_date.strftime('%b %d') }}<br>
+                    <i class="fas fa-dollar-sign me-1"></i>${{ "%.0f"|format(trip.budget) }} Budget<br>
+                    <span class="badge bg-{{ 'success' if trip.status == 'itinerary_generated' else 'warning' }}">{{ trip.status.replace('_', ' ').title() }}</span>
+                </p>
+                <a href="{{ url_for('trip_detail', trip_id=trip.id) }}" class="btn btn-primary w-100">View Details</a>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+{% endif %}
+
+<div class="row mt-5">
+    <div class="col text-center">
+        <div class="card">
+            <div class="card-body">
+                <h3><i class="fas fa-rocket me-2 text-primary"></i>AI-Powered Trip Planning</h3>
+                <p class="lead text-muted">Create trips → Add friends → Send SMS surveys → Get perfect AI itineraries with photos!</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
