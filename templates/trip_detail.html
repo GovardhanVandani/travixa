@@ -129,4 +129,35 @@ document.getElementById('participantForm').addEventListener('submit', function(e
     });
 });
 </script>
+<!-- Add this button after "Generate AI Itinerary" -->
+{% if trip.status == 'participants_added' %}
+<button class="btn btn-success btn-lg ms-2" onclick="sendSurveys({{ trip.id }})">
+    <i class="fas fa-sms me-2"></i>Send SMS Surveys
+</button>
+{% endif %}
+
+<script>
+async function sendSurveys(tripId) {
+    const btn = event.target;
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Sending...';
+    
+    try {
+        const response = await fetch(`/trip/${tripId}/send-surveys`, {
+            method: 'POST'
+        });
+        const data = await response.json();
+        
+        if (data.success) {
+            alert(`✅ SMS sent to ${data.sent}/${data.total} participants!`);
+            location.reload();
+        }
+    } catch (error) {
+        alert('❌ Error sending surveys');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = '<i class="fas fa-sms me-2"></i>Send SMS Surveys';
+    }
+}
+</script>
 {% endblock %}

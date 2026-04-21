@@ -24,4 +24,7 @@ env/
 
 # OS
 .DS_Store
-Thumbs.db
+Thumbs.dbvenv/ 
+instance/ 
+__pycache__/ 
+.env 
